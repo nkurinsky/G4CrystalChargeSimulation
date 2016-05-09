@@ -35,8 +35,8 @@
 ChargeDetectorConstruction::ChargeDetectorConstruction() :
   sensitivity(nullptr), topSurfProp(nullptr), botSurfProp(nullptr),
   wallSurfProp(nullptr), latManager(G4LatticeManager::GetLatticeManager()),
-  fEMField(nullptr), air(nullptr), germanium(nullptr),
-  aluminum(nullptr), tungsten(nullptr), worldPhys(nullptr), zipThickness(2.54*cm),
+  fEMField(nullptr), air(nullptr), substrate(nullptr),
+  aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm),
   epotScale(0.), voltage(0.), constructed(false), epotFileName(""),
   outputFileName("")
 {
@@ -68,11 +68,10 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
     if (epotFileName != G4CMPConfigManager::GetEpotFile() ||
         epotScale != G4CMPConfigManager::GetEpotScale() ||
         voltage != G4CMPConfigManager::GetVoltage()) {
-
-        epotFileName = G4CMPConfigManager::GetEpotFile();
-        epotScale = G4CMPConfigManager::GetEpotScale();
-        voltage = G4CMPConfigManager::GetVoltage();
-       delete fEMField; fEMField = nullptr;
+      epotFileName = G4CMPConfigManager::GetEpotFile();
+      epotScale = G4CMPConfigManager::GetEpotScale();
+      voltage = G4CMPConfigManager::GetVoltage();
+      delete fEMField; fEMField = nullptr;
     }
     // Sensitivity doesn't need to ever be deleted, just updated.
     if (outputFileName != G4CMPConfigManager::GetHitOutput()) {
@@ -103,101 +102,53 @@ void ChargeDetectorConstruction::DefineMaterials() {
   air = nistManager->FindOrBuildMaterial("G4_AIR");
   substrate = nistManager->FindOrBuildMaterial("G4_Ge");
   aluminum = nistManager->FindOrBuildMaterial("G4_Al");
-  tungsten = nistManager->FindOrBuildMaterial("G4_W");
 
   // Attach lattice information for germanium
   latManager->LoadLattice(substrate, "Ge");
 }
 
-void ChargeDetectorConstruction::SetupGeometry()
-{
+void ChargeDetectorConstruction::SetupGeometry() {
   // World
-  G4VSolid* worldSolid = new G4Box("World", 16.*cm, 16.*cm, 16.*cm);
-  G4LogicalVolume* worldLogical = new G4LogicalVolume(worldSolid,
-                                                      air,
-                                                      "World");
-  worldPhys = new G4PVPlacement(0,
-                                G4ThreeVector(),
-                                worldLogical,
-                                "World",
-                                0,
-                                false,
-                                0);
+  G4VSolid*          worldSolid = new G4Box("World", 1.*cm, 1.*cm, 1.*cm);
+  G4LogicalVolume* worldLogical = new G4LogicalVolume(worldSolid, air, "World");
+  worldPhys = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "World", 0, false, 0);
 
   // Test Crystal
-  G4VSolid* substrateSolid = new G4Tubs("SubstrateBlock", 0.*cm, 3.81*cm,
-                                        zipThickness/2., 0.*deg, 360.*deg);
-
-  G4LogicalVolume* detectorLogical = new G4LogicalVolume(substrateSolid, substrate,
-                                                          "SubstrateLogical");
-  G4VPhysicalVolume* detectorPhysical = new G4PVPlacement(0, G4ThreeVector(),
-                                                           detectorLogical,
-                                                           "SubstratePhysical",
-                                                           worldLogical,
-                                                           false, 0);
+  G4VSolid*             substrateSolid = new G4Box("SubstrateBlock", 5.*mm, 5.*mm, thickness/2);
+  G4LogicalVolume*    substrateLogical = new G4LogicalVolume(substrateSolid, substrate, "SubstrateLogical");
+  G4VPhysicalVolume* substratePhysical = new G4PVPlacement(0, G4ThreeVector(), substrateLogical, "SubstratePhysical", worldLogical, false, 0);
 
   // Attach E field to germanium (logical volume, so all placements)
-  AttachField(germaniumLogical);
-
+  AttachField(substrateLogical);
   // Physical lattice for each placed detector
-  AttachLattice(germaniumPhysical);
+  AttachLattice(substratePhysical);
 
   // Aluminum
-  G4VSolid* aluminumSolid = new G4Tubs("aluminiumSolid", 0.*cm, 3.81*cm,
-                                       0.01*cm, 0.*deg, 360.*deg);
-  G4LogicalVolume* aluminumLogical = new G4LogicalVolume(aluminumSolid,
-                                                         aluminum,
-                                                         "aluminumLogical");
-
-  G4VPhysicalVolume* aluminumTopPhys = new G4PVPlacement(
-                                               0,
-                                               G4ThreeVector(0.,0.,1.28*cm),
-                                               aluminumLogical,
-                                               "topAluminumPhysical",
-                                                worldLogical,
-                                               false,
-                                               0);
-
-  G4VPhysicalVolume* aluminumBotPhys = new G4PVPlacement(
-                                               0,
-                                               G4ThreeVector(0.,0.,-1.28*cm),
-                                               aluminumLogical,
-                                               "bottomAluminumPhysical",
-                                               worldLogical,
-                                               false,
-                                               1);
+  G4VSolid*            aluminumSolid = new G4Box("aluminiumSolid", 5.*mm, 5.*mm, 0.01*cm); //solid alumnium surface
+  G4LogicalVolume*   aluminumLogical = new G4LogicalVolume(aluminumSolid, aluminum, "aluminumLogical");
+  G4VPhysicalVolume* aluminumTopPhys = new G4PVPlacement(0, G4ThreeVector(0.,0.,thickness/2), aluminumLogical, "topAluminumPhysical", worldLogical, false, 0);
+  G4VPhysicalVolume* aluminumBotPhys = new G4PVPlacement(0, G4ThreeVector(0.,0.,-thickness/2), aluminumLogical, "bottomAluminumPhysical", worldLogical, false, 1);
 
   // Define surface properties. Only should be done once
   if (!constructed) {
-    topSurfProp = new G4CMPSurfaceProperty("topSurfProp",
-                                           1., 0., 0., 0.,
-                                           0., 1., 1., 0.);
-    botSurfProp = new G4CMPSurfaceProperty("botSurfProp",
-                                           1., 0., 0., 0.,
-                                           0., 1., 1., 0.);
-    wallSurfProp = new G4CMPSurfaceProperty("wallSurfProp",
-                                            1., 0., 0., 0.,
-                                            0., 1., 1., 0.);
+    topSurfProp = new G4CMPSurfaceProperty("topSurfProp", 1., 0., 0., 0., 0., 1., 1., 0.);
+    botSurfProp = new G4CMPSurfaceProperty("botSurfProp", 1., 0., 0., 0., 0., 1., 1., 0.);
+    wallSurfProp = new G4CMPSurfaceProperty("wallSurfProp", 1., 0., 0., 0., 0., 1., 1., 0.);
   }
 
   // Add surfaces between Ge-Al, and Ge-World
-  new G4LogicalBorderSurface("iZIPTop", germaniumPhysical, aluminumTopPhys,
-                             topSurfProp);
-
-  new G4LogicalBorderSurface("iZIPBot", germaniumPhysical, aluminumBotPhys,
-                             botSurfProp);
-
-  new G4LogicalBorderSurface("iZIPWall", germaniumPhysical, worldPhys,
-                             wallSurfProp);
+  new G4LogicalBorderSurface("XtalTop", substratePhysical, aluminumTopPhys, topSurfProp);
+  new G4LogicalBorderSurface("XtalBot", substratePhysical, aluminumBotPhys, botSurfProp);
+  new G4LogicalBorderSurface("xTalWall", substratePhysical, worldPhys,  wallSurfProp);
 
   // detector -- Note : Aluminum electrode sensitivity is attached to Germanium
-  AttachSensitivity(germaniumLogical);
+  AttachSensitivity(substrateLogical);
 
   // Visualization attributes
   worldLogical->SetVisAttributes(G4VisAttributes::Invisible);
   G4VisAttributes* simpleBoxVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);
-  germaniumLogical->SetVisAttributes(simpleBoxVisAtt);
+  substrateLogical->SetVisAttributes(simpleBoxVisAtt);
   aluminumLogical->SetVisAttributes(simpleBoxVisAtt);
 }
 
@@ -205,7 +156,7 @@ void ChargeDetectorConstruction::AttachField(G4LogicalVolume* lv)
 {
   if (!fEMField) { // Only create field if one doesn't exist.
     if (voltage != 0.0) {
-      G4double fieldMag = voltage/zipThickness;
+      G4double fieldMag = voltage/thickness;
       fEMField = new G4UniformElectricField(fieldMag*G4ThreeVector(0., 0., 1.));
     } else {
       fEMField = new G4CMPMeshElectricField(epotFileName);
@@ -224,7 +175,7 @@ void ChargeDetectorConstruction::AttachField(G4LogicalVolume* lv)
 void ChargeDetectorConstruction::AttachLattice(G4VPhysicalVolume* pv)
 {
   G4LatticePhysical* detLattice =
-    new G4LatticePhysical(latManager->GetLattice(germanium)); //MODIFY
+    new G4LatticePhysical(latManager->GetLattice(substrate)); 
   //MODIFY
   detLattice->SetLatticeOrientation(0.,45.*deg);	// Flats at [110]
   latManager->RegisterLattice(pv, detLattice);

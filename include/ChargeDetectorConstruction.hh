@@ -40,12 +40,11 @@ private:
   G4CMPSurfaceProperty* wallSurfProp;
   G4LatticeManager* latManager;
   G4ElectricField* fEMField;
-  G4Material* liquidHelium;
-  G4Material* germanium;
+  G4Material* air;
+  G4Material* substrate;
   G4Material* aluminum;
-  G4Material* tungsten;
   G4VPhysicalVolume* worldPhys;
-  G4double zipThickness; // Useful for geom. and field
+  G4double thickness; // Useful for geom. and field
   G4double epotScale;
   G4double voltage;
   G4bool constructed;
