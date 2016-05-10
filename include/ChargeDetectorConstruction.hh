@@ -18,6 +18,7 @@ class G4VPhysicalVolume;
 class G4VUserDetectorConstruction;
 class G4ElectricField;
 
+class ChargeDetectorMessenger;
 
 class ChargeDetectorConstruction : public G4VUserDetectorConstruction {
 public:
@@ -25,6 +26,8 @@ public:
   virtual ~ChargeDetectorConstruction();
 
   virtual G4VPhysicalVolume* Construct();
+  void SetXtalMaterial(G4String mat);
+  void SetXtalOrientation(G4String orient);
      
 private:
   void DefineMaterials();
@@ -48,8 +51,12 @@ private:
   G4double epotScale;
   G4double voltage;
   G4bool constructed;
+  G4String xtalMaterial;
+  G4String xtalOrientation;
   G4String epotFileName;
   G4String outputFileName;
+
+  ChargeDetectorMessenger * fMessenger;
 };
 
 #endif

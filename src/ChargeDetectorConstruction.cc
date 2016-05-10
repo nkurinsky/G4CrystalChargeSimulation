@@ -6,6 +6,7 @@
 // $Id: be4e879b33241dd90f04560177057fb1aecebf27 $
 
 #include "ChargeDetectorConstruction.hh"
+#include "ChargeDetectorMessenger.hh"
 #include "ChargeElectrodeSensitivity.hh"
 #include "G4CMPSurfaceProperty.hh"
 #include "G4LogicalBorderSurface.hh"
@@ -31,27 +32,27 @@
 #include "G4SolidStore.hh"
 #include "G4UniformElectricField.hh"
 
-
 ChargeDetectorConstruction::ChargeDetectorConstruction() :
   sensitivity(nullptr), topSurfProp(nullptr), botSurfProp(nullptr),
   wallSurfProp(nullptr), latManager(G4LatticeManager::GetLatticeManager()),
   fEMField(nullptr), air(nullptr), substrate(nullptr),
   aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm),
   epotScale(0.), voltage(0.), constructed(false), epotFileName(""),
-  outputFileName("")
-{
+  outputFileName(""), xtalMaterial("Ge"), xtalOrientation("001"){
   /* Default initialization does not leave object in unusable state.
    * Doesn't matter because run initialization will call Construct() and all
    * will be well.
    */
+  fMessenger = new ChargeDetectorMessenger(this);
 }
-
+  
 ChargeDetectorConstruction::~ChargeDetectorConstruction()
 {
   delete fEMField;
   delete topSurfProp;
   delete botSurfProp;
   delete wallSurfProp;
+  delete fMessenger;
 }
 
 G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
@@ -95,16 +96,26 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
   return worldPhys;
 }
 
+void ChargeDetectorConstruction::SetXtalMaterial(G4String mat){
+  cout << mat << endl;
+  xtalMaterial=mat;
+}
+
+void ChargeDetectorConstruction::SetXtalOrientation(G4String orient){
+  cout << orient << endl;
+  xtalOrientation=orient;
+}
+
 void ChargeDetectorConstruction::DefineMaterials() { 
   G4NistManager* nistManager = G4NistManager::Instance();
 
   //have messenger determine subtrate
   air = nistManager->FindOrBuildMaterial("G4_AIR");
-  substrate = nistManager->FindOrBuildMaterial("G4_Ge");
+  substrate = nistManager->FindOrBuildMaterial("G4_"+xtalMaterial);
   aluminum = nistManager->FindOrBuildMaterial("G4_Al");
 
   // Attach lattice information for germanium
-  latManager->LoadLattice(substrate, "Ge");
+  latManager->LoadLattice(substrate, xtalMaterial);
 }
 
 void ChargeDetectorConstruction::SetupGeometry() {
