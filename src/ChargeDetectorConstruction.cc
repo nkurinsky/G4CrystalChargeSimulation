@@ -97,12 +97,27 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
 }
 
 void ChargeDetectorConstruction::SetXtalMaterial(G4String mat){
-  std::cout << mat << std::endl;
   xtalMaterial=mat;
 }
 
 void ChargeDetectorConstruction::SetXtalOrientation(G4String orient){
-  std::cout << orient << std::endl;
+  if(orient == '001' or orient == '010' or orient == '100'){
+    xtalTheta=0.0*deg;
+    xtalPhi=45.*deg;
+  }
+  else if(orient == '110' or orient == '011' or orient == '101'){
+    xtalTheta=90.0*deg;
+    xtalPhi=45.*deg;
+  }
+  else if(orient == '111'){
+    xtalTheta=54.74*deg;
+    xtalPhi=45.*deg;
+  }
+  else{
+    std::cerr << "Orientation not recognized" << std::endl;
+    exit(1);
+  }
+  
   xtalOrientation=orient;
 }
 
@@ -114,7 +129,7 @@ void ChargeDetectorConstruction::DefineMaterials() {
   substrate = nistManager->FindOrBuildMaterial("G4_"+xtalMaterial);
   aluminum = nistManager->FindOrBuildMaterial("G4_Al");
 
-  // Attach lattice information for germanium
+  // Attach lattice information for set crystal material
   latManager->LoadLattice(substrate, xtalMaterial);
 }
 
@@ -187,8 +202,7 @@ void ChargeDetectorConstruction::AttachLattice(G4VPhysicalVolume* pv)
 {
   G4LatticePhysical* detLattice =
     new G4LatticePhysical(latManager->GetLattice(substrate)); 
-  //MODIFY
-  detLattice->SetLatticeOrientation(0.,45.*deg);	// Flats at [110]
+  detLattice->SetLatticeOrientation(xtalTheta,xtalPhi);	// Flats at [110]
   latManager->RegisterLattice(pv, detLattice);
 }
 

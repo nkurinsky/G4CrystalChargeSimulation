@@ -50,6 +50,8 @@ private:
   G4double thickness; // Useful for geom. and field
   G4double epotScale;
   G4double voltage;
+  G4double xtalTheta;
+  G4double xtalPhi;
   G4bool constructed;
   G4String xtalMaterial;
   G4String xtalOrientation;
