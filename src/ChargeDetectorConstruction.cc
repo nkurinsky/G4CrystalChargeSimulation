@@ -37,8 +37,8 @@ ChargeDetectorConstruction::ChargeDetectorConstruction() :
   wallSurfProp(nullptr), latManager(G4LatticeManager::GetLatticeManager()),
   fEMField(nullptr), air(nullptr), substrate(nullptr),
   aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm),
-  epotScale(0.), voltage(0.), constructed(false), epotFileName(""),
-  outputFileName(""), xtalMaterial("Ge"), xtalOrientation("001"){
+  epotScale(0.), voltage(0.), constructed(false), xtalMaterial("Ge"), xtalOrientation("001"), epotFileName(""),
+  outputFileName(""){
   /* Default initialization does not leave object in unusable state.
    * Doesn't matter because run initialization will call Construct() and all
    * will be well.
@@ -97,12 +97,12 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
 }
 
 void ChargeDetectorConstruction::SetXtalMaterial(G4String mat){
-  cout << mat << endl;
+  std::cout << mat << std::endl;
   xtalMaterial=mat;
 }
 
 void ChargeDetectorConstruction::SetXtalOrientation(G4String orient){
-  cout << orient << endl;
+  std::cout << orient << std::endl;
   xtalOrientation=orient;
 }
 
