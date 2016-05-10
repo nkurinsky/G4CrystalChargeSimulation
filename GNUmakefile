@@ -4,12 +4,12 @@
 # 20140509  Support different executables by looking at target name
 
 ifndef G4CMP_NAME		# Two-pass method
-  .PHONY : g4cmpCharge
+  .PHONY : g4TestXtal
 
-  g4cmpCharge :
+  g4TestXtal :
 	@$(MAKE) G4CMP_NAME=$@ bin
 
-  G4CMP_NAME := g4cmpCharge
+  G4CMP_NAME := g4TestXtal
 endif
 
 include ../g4cmp.gmk
