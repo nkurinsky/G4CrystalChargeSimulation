@@ -101,16 +101,19 @@ void ChargeDetectorConstruction::SetXtalMaterial(G4String mat){
 }
 
 void ChargeDetectorConstruction::SetXtalOrientation(G4String orient){
-  if(orient == '001' or orient == '010' or orient == '100'){
+  if(orient == "001" or orient == "010" or orient == "100"){
+    std::cout << "Using 001 Orientation" << std::endl;
     xtalTheta=0.0*deg;
     xtalPhi=45.*deg;
   }
-  else if(orient == '110' or orient == '011' or orient == '101'){
+  else if(orient == "110" or orient == "011" or orient == "101"){
+    std::cout << "Using 110 Orientation" << std::endl;
     xtalTheta=90.0*deg;
     xtalPhi=45.*deg;
   }
-  else if(orient == '111'){
-    xtalTheta=54.74*deg;
+  else if(orient == "111"){
+    std::cout << "Using 111 Orientation" << std::endl;
+    xtalTheta=54.7356*deg;
     xtalPhi=45.*deg;
   }
   else{
