@@ -1,0 +1,12 @@
+# Generate entire drift curve in one macro (no loops)
+
+/tracking/verbose 0
+/control/verbose 1
+/run/printProgress 10
+
+/det/setXtalMaterial Si
+/det/setXtalOrientation 111
+/g4cmp/voltage 0.5 volt
+/g4cmp/HitsFile orient_test_IV.txt
+/run/initialize
+/run/beamOn 10000
