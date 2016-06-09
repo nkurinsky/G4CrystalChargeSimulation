@@ -38,7 +38,7 @@ ChargeDetectorConstruction::ChargeDetectorConstruction() :
   fEMField(nullptr), air(nullptr), substrate(nullptr),
   aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm),
   epotScale(0.), voltage(0.), constructed(false), xtalMaterial("Ge"), xtalOrientation("001"), epotFileName(""),
-  outputFileName(""){
+  outputFileName(""), xtalTheta(0.0*deg), xtalPhi(45.*deg){
   /* Default initialization does not leave object in unusable state.
    * Doesn't matter because run initialization will call Construct() and all
    * will be well.
@@ -205,7 +205,10 @@ void ChargeDetectorConstruction::AttachLattice(G4VPhysicalVolume* pv)
 {
   G4LatticePhysical* detLattice =
     new G4LatticePhysical(latManager->GetLattice(substrate)); 
-  detLattice->SetLatticeOrientation(xtalTheta,xtalPhi);	// Flats at [110]
+  G4int h,k,l;// Buffers filled from UI command args
+  G4CMPConfigManager::GetMillerOrientation(h,k,l);
+  detLattice->SetMillerOrientation(h,k,l,45.0*deg);
+  std::cout << "Orientation: " << h << " " << k << " " << l << std::endl;
   latManager->RegisterLattice(pv, detLattice);
 }
 
