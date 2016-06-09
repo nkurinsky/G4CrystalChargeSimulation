@@ -137,6 +137,9 @@ void ChargeDetectorConstruction::DefineMaterials() {
 }
 
 void ChargeDetectorConstruction::SetupGeometry() {
+  // Constants
+  G4Double alThickness(600*nm);
+
   // World
   G4VSolid*          worldSolid = new G4Box("World", 1.*cm, 1.*cm, 1.*cm);
   G4LogicalVolume* worldLogical = new G4LogicalVolume(worldSolid, air, "World");
@@ -153,10 +156,10 @@ void ChargeDetectorConstruction::SetupGeometry() {
   AttachLattice(substratePhysical);
 
   // Aluminum
-  G4VSolid*            aluminumSolid = new G4Box("aluminiumSolid", 5.*mm, 5.*mm, 0.01*cm); //solid alumnium surface
+  G4VSolid*            aluminumSolid = new G4Box("aluminiumSolid", 5.*mm, 5.*mm, alThickness/2.0); //solid alumnium surface
   G4LogicalVolume*   aluminumLogical = new G4LogicalVolume(aluminumSolid, aluminum, "aluminumLogical");
-  G4VPhysicalVolume* aluminumTopPhys = new G4PVPlacement(0, G4ThreeVector(0.,0.,thickness/2), aluminumLogical, "topAluminumPhysical", worldLogical, false, 0);
-  G4VPhysicalVolume* aluminumBotPhys = new G4PVPlacement(0, G4ThreeVector(0.,0.,-thickness/2), aluminumLogical, "bottomAluminumPhysical", worldLogical, false, 1);
+  G4VPhysicalVolume* aluminumTopPhys = new G4PVPlacement(0, G4ThreeVector(0.,0.,thickness/2+alThickness/2.0), aluminumLogical, "topAluminumPhysical", worldLogical, false, 0);
+  G4VPhysicalVolume* aluminumBotPhys = new G4PVPlacement(0, G4ThreeVector(0.,0.,-thickness/2-alThickness/2.0), aluminumLogical, "bottomAluminumPhysical", worldLogical, false, 1);
 
   // Define surface properties. Only should be done once
   if (!constructed) {
