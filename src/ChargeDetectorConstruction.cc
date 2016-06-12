@@ -138,7 +138,7 @@ void ChargeDetectorConstruction::DefineMaterials() {
 
 void ChargeDetectorConstruction::SetupGeometry() {
   // Constants
-  G4Double alThickness(600*nm);
+  G4double alThickness(600*nm);
 
   // World
   G4VSolid*          worldSolid = new G4Box("World", 1.*cm, 1.*cm, 1.*cm);
