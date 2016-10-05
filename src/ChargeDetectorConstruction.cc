@@ -90,6 +90,7 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
     epotFileName = G4CMPConfigManager::GetEpotFile();
     outputFileName = G4CMPConfigManager::GetHitOutput();
   }
+  std::cout << "Define Materials" << std::endl;
   DefineMaterials();
   SetupGeometry();
   constructed = true;

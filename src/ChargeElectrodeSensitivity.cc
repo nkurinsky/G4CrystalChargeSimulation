@@ -53,7 +53,8 @@ void ChargeElectrodeSensitivity::EndOfEvent(G4HCofThisEvent* HCE)
              << (*itr)->GetStartPosition().getZ()/m << ','
              << (*itr)->GetFinalPosition().getX()/m << ','
              << (*itr)->GetFinalPosition().getY()/m << ','
-             << (*itr)->GetFinalPosition().getZ()/m << G4endl;
+             << (*itr)->GetFinalPosition().getZ()/m << ','
+	     << (*itr)->GetIVSCount() << G4endl;
     }
   }
 }

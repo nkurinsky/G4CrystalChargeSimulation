@@ -2,6 +2,7 @@
 
 /tracking/verbose 0
 /control/verbose 1
+/run/verbose 2
 /run/printProgress 10
 
 /det/setXtalMaterial Si
