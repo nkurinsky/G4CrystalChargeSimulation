@@ -90,7 +90,6 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
     epotFileName = G4CMPConfigManager::GetEpotFile();
     outputFileName = G4CMPConfigManager::GetHitOutput();
   }
-  std::cout << "Define Materials" << std::endl;
   DefineMaterials();
   SetupGeometry();
   constructed = true;
@@ -123,6 +122,16 @@ void ChargeDetectorConstruction::SetXtalOrientation(G4String orient){
   }
   
   xtalOrientation=orient;
+}
+
+void ChargeDetectorConstruction::SetXtalThickness(G4double thick){
+  if(thick > 0.0){
+    thickness = thick;
+  }
+  else{
+    std::cerr << "Invalid negative thickness \"" << thick << "\"" << std::endl;
+    exit(2);
+  }
 }
 
 void ChargeDetectorConstruction::DefineMaterials() { 

@@ -29,6 +29,7 @@ private:
   G4UIdirectory*           fDetDirectory;
   G4UIcmdWithAString*      fXtalMatCmd;
   G4UIcmdWithAString*      fXtalOrientCmd;
+  G4UIcmdWithAString*      fXtalThickCmd;
 };
 
 #endif /* G4CMPConfigMessenger_hh */

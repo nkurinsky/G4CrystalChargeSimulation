@@ -22,12 +22,18 @@ ChargeDetectorMessenger::ChargeDetectorMessenger(ChargeDetectorConstruction* Det
   fXtalOrientCmd->SetGuidance("Select Orientation of the Crystal.");
   fXtalOrientCmd->SetParameterName("choice",false);
   fXtalOrientCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  fXtalThickCmd = new G4UIcmdWithAString("/det/setXtalThickness",this);
+  fXtalThickCmd->SetGuidance("Select Thickness (mm) of the crystal");
+  fXtalThickCmd->SetParameterName("choice",false);
+  fXtalThickCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 ChargeDetectorMessenger::~ChargeDetectorMessenger()
 {
   delete fXtalMatCmd;
   delete fXtalOrientCmd;
+  delete fXtalThickCmd;
   delete fDetDirectory;
 }
 
@@ -39,4 +45,7 @@ void ChargeDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue
 
   if( command == fXtalOrientCmd )
    { fDetectorConstruction->SetXtalOrientation(newValue);}
+
+  if( command == fXtalOrientCmd )
+    { fDetectorConstruction->SetXtalThickness(static_cast<G4double>(newValue));}
 } 

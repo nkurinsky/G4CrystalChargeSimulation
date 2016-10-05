@@ -28,6 +28,7 @@ public:
   virtual G4VPhysicalVolume* Construct();
   void SetXtalMaterial(G4String mat);
   void SetXtalOrientation(G4String orient);
+  void SetXtalThickness(G4double thickness);
      
 private:
   void DefineMaterials();
