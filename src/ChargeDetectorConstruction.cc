@@ -36,9 +36,10 @@ ChargeDetectorConstruction::ChargeDetectorConstruction() :
   sensitivity(nullptr), topSurfProp(nullptr), botSurfProp(nullptr),
   wallSurfProp(nullptr), latManager(G4LatticeManager::GetLatticeManager()),
   fEMField(nullptr), air(nullptr), substrate(nullptr),
-  aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm),
-  epotScale(0.), voltage(0.), constructed(false), xtalMaterial("Ge"), xtalOrientation("001"), epotFileName(""),
-  outputFileName(""), xtalTheta(0.0*deg), xtalPhi(45.*deg){
+  aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm), IVRate(-1),
+  epotScale(0.), voltage(0.), xtalTheta(0.0*deg),  xtalPhi(45.0*deg), 
+  constructed(false), xtalMaterial("Ge"), xtalOrientation("001"), epotFileName(""),
+  outputFileName(""){
   /* Default initialization does not leave object in unusable state.
    * Doesn't matter because run initialization will call Construct() and all
    * will be well.
@@ -126,11 +127,23 @@ void ChargeDetectorConstruction::SetXtalOrientation(G4String orient){
 
 void ChargeDetectorConstruction::SetXtalThickness(G4double thick){
   if(thick > 0.0){
-    thickness = thick;
+    std::cout << "Changing thickness to " << thick << "mm" << std::endl;
+    thickness = thick*mm;
   }
   else{
     std::cerr << "Invalid negative thickness \"" << thick << "\"" << std::endl;
     exit(2);
+  }
+}
+
+void ChargeDetectorConstruction::SetXtalIVRate(G4double rate){
+  if(rate > 0){
+    std::cout << "Changing IVRate to a DC level of " << rate << " Hz" << std::endl;
+    IVRate=rate;
+  }
+  else{
+    std::cerr << "Invalid rate" << std::endl;
+    exit(3);
   }
 }
 
@@ -143,7 +156,13 @@ void ChargeDetectorConstruction::DefineMaterials() {
   aluminum = nistManager->FindOrBuildMaterial("G4_Al");
 
   // Attach lattice information for set crystal material
-  latManager->LoadLattice(substrate, xtalMaterial);
+  G4LatticeLogical* newLattice = latManager->LoadLattice(substrate, xtalMaterial);
+  if(IVRate > 0){
+    std::cout << "Changing default lattice IVRate to a DC level of " << IVRate <<" Hz" << std::endl;
+    newLattice->SetIVExponent(0.0);
+    newLattice->SetIVRate(IVRate/s);
+    std::cout << newLattice->GetIVRate() << " " << newLattice->GetIVExponent() << std::endl;
+  }
 }
 
 void ChargeDetectorConstruction::SetupGeometry() {

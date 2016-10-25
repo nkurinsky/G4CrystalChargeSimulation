@@ -27,6 +27,11 @@ ChargeDetectorMessenger::ChargeDetectorMessenger(ChargeDetectorConstruction* Det
   fXtalThickCmd->SetGuidance("Select Thickness (mm) of the crystal");
   fXtalThickCmd->SetParameterName("choice",false);
   fXtalThickCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  fXtalRateCmd = new G4UIcmdWithAString("/det/setXtalIVRate",this);
+  fXtalRateCmd->SetGuidance("Select Intervalley Scattering Rate (Hz) of the crystal");
+  fXtalRateCmd->SetParameterName("choice",false);
+  fXtalRateCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 ChargeDetectorMessenger::~ChargeDetectorMessenger()
@@ -34,6 +39,7 @@ ChargeDetectorMessenger::~ChargeDetectorMessenger()
   delete fXtalMatCmd;
   delete fXtalOrientCmd;
   delete fXtalThickCmd;
+  delete fXtalRateCmd;
   delete fDetDirectory;
 }
 
@@ -46,6 +52,13 @@ void ChargeDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue
   if( command == fXtalOrientCmd )
    { fDetectorConstruction->SetXtalOrientation(newValue);}
 
-  if( command == fXtalOrientCmd )
-    { fDetectorConstruction->SetXtalThickness(static_cast<G4double>(newValue));}
+  if( command == fXtalThickCmd ){ 
+    G4double thick = atof(newValue);
+    fDetectorConstruction->SetXtalThickness(thick);
+  }
+
+  if( command == fXtalRateCmd ){
+    G4double rate = atof(newValue);
+    fDetectorConstruction->SetXtalIVRate(rate);
+  }
 } 

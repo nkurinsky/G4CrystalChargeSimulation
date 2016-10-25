@@ -29,6 +29,7 @@ public:
   void SetXtalMaterial(G4String mat);
   void SetXtalOrientation(G4String orient);
   void SetXtalThickness(G4double thickness);
+  void SetXtalIVRate(G4double rate);
      
 private:
   void DefineMaterials();
@@ -49,6 +50,7 @@ private:
   G4Material* aluminum;
   G4VPhysicalVolume* worldPhys;
   G4double thickness; // Useful for geom. and field
+  G4double IVRate;
   G4double epotScale;
   G4double voltage;
   G4double xtalTheta;

@@ -75,7 +75,7 @@ void ChargeElectrodeSensitivity::SetOutputFile(const G4String &fn)
     } else {
       output << "Run ID,Event ID,Track ID,Charge,Start Energy [eV],"
              << "Track Lifetime [ns],Energy Deposit [eV],Start X [m],"
-             << "Start Y [m],Start Z [m],End X [m],End Y [m],End Z [m]"
+             << "Start Y [m],Start Z [m],End X [m],End Y [m],End Z [m], IVSCount"
              << G4endl;
     }
   }

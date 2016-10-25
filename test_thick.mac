@@ -1,0 +1,14 @@
+# Generate entire drift curve in one macro (no loops)
+
+/tracking/verbose 0
+/control/verbose 1
+/run/verbose 2
+/run/printProgress 10
+
+/det/setXtalMaterial Si
+/det/setXtalThickness 8.9
+
+/g4cmp/voltage 0.5 volt
+/g4cmp/HitsFile thickness_test.txt
+/run/initialize
+/run/beamOn 10
