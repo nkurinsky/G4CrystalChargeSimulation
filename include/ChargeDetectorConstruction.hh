@@ -30,6 +30,8 @@ public:
   void SetXtalOrientation(G4String orient);
   void SetXtalThickness(G4double thickness);
   void SetXtalIVRate(G4double rate);
+  void SetXtaleL0(G4double mfp);
+  void SetXtalhL0(G4double mfp);
      
 private:
   void DefineMaterials();
@@ -51,6 +53,8 @@ private:
   G4VPhysicalVolume* worldPhys;
   G4double thickness; // Useful for geom. and field
   G4double IVRate;
+  G4double eL0;
+  G4double hL0;
   G4double epotScale;
   G4double voltage;
   G4double xtalTheta;

@@ -36,7 +36,7 @@ ChargeDetectorConstruction::ChargeDetectorConstruction() :
   sensitivity(nullptr), topSurfProp(nullptr), botSurfProp(nullptr),
   wallSurfProp(nullptr), latManager(G4LatticeManager::GetLatticeManager()),
   fEMField(nullptr), air(nullptr), substrate(nullptr),
-  aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm), IVRate(-1),
+  aluminum(nullptr), worldPhys(nullptr), thickness(8.*mm), IVRate(-1), eL0(-1), hL0(-1),
   epotScale(0.), voltage(0.), xtalTheta(0.0*deg),  xtalPhi(45.0*deg), 
   constructed(false), xtalMaterial("Ge"), xtalOrientation("001"), epotFileName(""),
   outputFileName(""){
@@ -147,6 +147,28 @@ void ChargeDetectorConstruction::SetXtalIVRate(G4double rate){
   }
 }
 
+void ChargeDetectorConstruction::SetXtaleL0(G4double mfp){
+  if(mfp > 0){
+    std::cout << "Changing eL0 to " << mfp << " meters" << std::endl;
+    eL0=mfp;
+  }
+  else{
+    std::cerr << "Invalid mfp" << std::endl;
+    exit(4);
+  }
+}
+
+void ChargeDetectorConstruction::SetXtalhL0(G4double mfp){
+  if(mfp > 0){
+    std::cout << "Changing hL0 to " << mfp << " meters" << std::endl;
+    hL0=mfp;
+  }
+  else{
+    std::cerr << "Invalid mfp" << std::endl;
+    exit(4);
+  }
+}
+
 void ChargeDetectorConstruction::DefineMaterials() { 
   G4NistManager* nistManager = G4NistManager::Instance();
 
@@ -161,7 +183,16 @@ void ChargeDetectorConstruction::DefineMaterials() {
     std::cout << "Changing default lattice IVRate to a DC level of " << IVRate <<" Hz" << std::endl;
     newLattice->SetIVExponent(0.0);
     newLattice->SetIVRate(IVRate/s);
-    std::cout << newLattice->GetIVRate() << " " << newLattice->GetIVExponent() << std::endl;
+  }
+  std::cout << newLattice->GetIVRate() << ", " << newLattice->GetIVExponent() << ", " << newLattice->GetIVField() << std::endl;
+
+  if(eL0 > 0){
+    std::cout << "Changing default lattice eL0 to " << eL0 << std::endl;
+    newLattice->SetElectronScatter(eL0*m);
+  }
+  if(hL0 > 0){
+    std::cout << "Changing default lattice hL0 to " << hL0 << std::endl;
+    newLattice->SetHoleScatter(hL0*m);
   }
 }
 
@@ -217,7 +248,7 @@ void ChargeDetectorConstruction::AttachField(G4LogicalVolume* lv)
 {
   if (!fEMField) { // Only create field if one doesn't exist.
     if (voltage != 0.0) {
-      G4double fieldMag = voltage/thickness;
+      G4double fieldMag = 2.0*voltage/thickness;
       fEMField = new G4UniformElectricField(fieldMag*G4ThreeVector(0., 0., 1.));
     } else {
       fEMField = new G4CMPMeshElectricField(epotFileName);

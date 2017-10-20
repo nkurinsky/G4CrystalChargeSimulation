@@ -31,6 +31,8 @@ private:
   G4UIcmdWithAString*      fXtalOrientCmd;
   G4UIcmdWithAString*      fXtalThickCmd;
   G4UIcmdWithAString*      fXtalRateCmd;
+  G4UIcmdWithAString*      fXtalEMfpCmd;
+  G4UIcmdWithAString*      fXtalHMfpCmd;
 };
 
 #endif /* G4CMPConfigMessenger_hh */
