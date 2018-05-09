@@ -4,9 +4,13 @@
 \***********************************************************************/
 
 // $Id: be4e879b33241dd90f04560177057fb1aecebf27 $
+//
+// 20180509  Updated to work with the latest version of G4CMP
 
 #include "ChargeDetectorConstruction.hh"
 #include "ChargeDetectorMessenger.hh"
+#include "ChargeConfigManager.hh"
+#include "ChargeConfigMessenger.hh"
 #include "ChargeElectrodeSensitivity.hh"
 #include "G4CMPSurfaceProperty.hh"
 #include "G4LogicalBorderSurface.hh"
@@ -31,6 +35,8 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4SolidStore.hh"
 #include "G4UniformElectricField.hh"
+
+#include "G4RunManager.hh"
 
 ChargeDetectorConstruction::ChargeDetectorConstruction() :
   sensitivity(nullptr), topSurfProp(nullptr), botSurfProp(nullptr),
@@ -67,17 +73,17 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
       G4SolidStore::GetInstance()->Clean();
     }
     // Only regenerate E field if it has changed since last construction.
-    if (epotFileName != G4CMPConfigManager::GetEpotFile() ||
-        epotScale != G4CMPConfigManager::GetEpotScale() ||
-        voltage != G4CMPConfigManager::GetVoltage()) {
-      epotFileName = G4CMPConfigManager::GetEpotFile();
-      epotScale = G4CMPConfigManager::GetEpotScale();
-      voltage = G4CMPConfigManager::GetVoltage();
+    if (epotFileName != ChargeConfigManager::GetEPotFile() ||
+        epotScale != ChargeConfigManager::GetEPotScale() ||
+        voltage != ChargeConfigManager::GetVoltage()) {
+      epotFileName = ChargeConfigManager::GetEPotFile();
+      epotScale = ChargeConfigManager::GetEPotScale();
+      voltage = ChargeConfigManager::GetVoltage();
       delete fEMField; fEMField = nullptr;
     }
     // Sensitivity doesn't need to ever be deleted, just updated.
-    if (outputFileName != G4CMPConfigManager::GetHitOutput()) {
-      outputFileName = G4CMPConfigManager::GetHitOutput();
+    if (outputFileName != ChargeConfigManager::GetHitOutput()) {
+      outputFileName = ChargeConfigManager::GetHitOutput();
       sensitivity->SetOutputFile(outputFileName);
     }
     // Have to completely remove all lattices to avoid warning on reconstruction
@@ -86,10 +92,10 @@ G4VPhysicalVolume* ChargeDetectorConstruction::Construct()
     // NOTE: No need to redefine the G4CMPSurfaceProperties
     G4LogicalBorderSurface::CleanSurfaceTable();
   } else { // First setup of geometry
-    epotScale = G4CMPConfigManager::GetEpotScale();
-    voltage = G4CMPConfigManager::GetVoltage();
-    epotFileName = G4CMPConfigManager::GetEpotFile();
-    outputFileName = G4CMPConfigManager::GetHitOutput();
+    epotScale = ChargeConfigManager::GetEPotScale();
+    voltage = ChargeConfigManager::GetVoltage();
+    epotFileName = ChargeConfigManager::GetEPotFile();
+    outputFileName = ChargeConfigManager::GetHitOutput();
   }
   DefineMaterials();
   SetupGeometry();
@@ -269,7 +275,7 @@ void ChargeDetectorConstruction::AttachLattice(G4VPhysicalVolume* pv)
   G4LatticePhysical* detLattice =
     new G4LatticePhysical(latManager->GetLattice(substrate)); 
   G4int h,k,l;// Buffers filled from UI command args
-  G4CMPConfigManager::GetMillerOrientation(h,k,l);
+  ChargeConfigManager::GetMillerOrientation(h,k,l);
   detLattice->SetMillerOrientation(h,k,l,45.0*deg);
   std::cout << "Orientation: " << h << " " << k << " " << l << std::endl;
   latManager->RegisterLattice(pv, detLattice);

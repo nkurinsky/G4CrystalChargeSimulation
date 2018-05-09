@@ -11,13 +11,17 @@
 #include "G4Event.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4SDManager.hh"
 
 #include <fstream>
+
+#include "/home/chris/repos/G4CMP/examples/charge/include/ChargeConfigManager.hh"
+
 
 ChargeElectrodeSensitivity::ChargeElectrodeSensitivity(G4String name) :
   G4CMPElectrodeSensitivity(name), fileName("")
 {
-  SetOutputFile(G4CMPConfigManager::GetHitOutput());
+  SetOutputFile(ChargeConfigManager::GetHitOutput());
 }
 
 ChargeElectrodeSensitivity::~ChargeElectrodeSensitivity()
@@ -34,29 +38,50 @@ ChargeElectrodeSensitivity::~ChargeElectrodeSensitivity()
 
 void ChargeElectrodeSensitivity::EndOfEvent(G4HCofThisEvent* HCE)
 {
-  G4CMPElectrodeHitsCollection* hitCol =
-        static_cast<G4CMPElectrodeHitsCollection*>(HCE->GetHC(GetHCID()));
+  G4int HCID = G4SDManager::GetSDMpointer()->GetCollectionID(hitsCollection);
+  auto* hitCol = static_cast<G4CMPElectrodeHitsCollection*>(HCE->GetHC(HCID));
+  // G4CMPElectrodeHitsCollection* hitCol =
+  //       static_cast<G4CMPElectrodeHitsCollection*>(HCE->GetHC(GetHCID()));
   std::vector<G4CMPElectrodeHit*>* hitVec = hitCol->GetVector();
   std::vector<G4CMPElectrodeHit*>::iterator itr = hitVec->begin();
   G4RunManager* runMan = G4RunManager::GetRunManager();
   if (output.good()) {
-    for (; itr != hitVec->end(); itr++) {
+    for (G4CMPElectrodeHit* hit : *hitVec) {
       output << runMan->GetCurrentRun()->GetRunID() << ','
              << runMan->GetCurrentEvent()->GetEventID() << ','
-             << (*itr)->GetTrackID() << ','
-             << (*itr)->GetCharge() << ','
-             << (*itr)->GetStartEnergy()/eV << ','
-             << (*itr)->GetFinalTime()/ns << ','
-             << (*itr)->GetEnergyDeposit()/eV << ','
-             << (*itr)->GetStartPosition().getX()/m << ','
-             << (*itr)->GetStartPosition().getY()/m << ','
-             << (*itr)->GetStartPosition().getZ()/m << ','
-             << (*itr)->GetFinalPosition().getX()/m << ','
-             << (*itr)->GetFinalPosition().getY()/m << ','
-             << (*itr)->GetFinalPosition().getZ()/m << ','
-	     << (*itr)->GetIVSCount() << G4endl;
+             << hit->GetTrackID() << ','
+             << hit->GetParticleName() << ','
+             << hit->GetStartEnergy()/eV << ','
+             << hit->GetStartPosition().getX()/m << ','
+             << hit->GetStartPosition().getY()/m << ','
+             << hit->GetStartPosition().getZ()/m << ','
+             << hit->GetStartTime()/ns << ','
+             << hit->GetEnergyDeposit()/eV << ','
+             << hit->GetWeight() << ','
+             << hit->GetFinalPosition().getX()/m << ','
+             << hit->GetFinalPosition().getY()/m << ','
+             << hit->GetFinalPosition().getZ()/m << ','
+             << hit->GetFinalTime()/ns << '\n';
     }
   }
+  // if (output.good()) {
+  //   for (; itr != hitVec->end(); itr++) {
+  //     output << runMan->GetCurrentRun()->GetRunID() << ','
+  //            << runMan->GetCurrentEvent()->GetEventID() << ','
+  //            << (*itr)->GetTrackID() << ','
+  //            << (*itr)->GetCharge() << ','
+  //            << (*itr)->GetStartEnergy()/eV << ','
+  //            << (*itr)->GetFinalTime()/ns << ','
+  //            << (*itr)->GetEnergyDeposit()/eV << ','
+  //            << (*itr)->GetStartPosition().getX()/m << ','
+  //            << (*itr)->GetStartPosition().getY()/m << ','
+  //            << (*itr)->GetStartPosition().getZ()/m << ','
+  //            << (*itr)->GetFinalPosition().getX()/m << ','
+  //            << (*itr)->GetFinalPosition().getY()/m << ','
+  //            << (*itr)->GetFinalPosition().getZ()/m << ','
+  // 	     << (*itr)->GetIVSCount() << G4endl;
+  //   }
+  // }
 }
 
 void ChargeElectrodeSensitivity::SetOutputFile(const G4String &fn)
