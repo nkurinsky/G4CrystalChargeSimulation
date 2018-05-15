@@ -15,7 +15,7 @@
 
 #include <fstream>
 
-#include "/home/chris/repos/G4CMP/examples/charge/include/ChargeConfigManager.hh"
+#include "ChargeConfigManager.hh"
 
 
 ChargeElectrodeSensitivity::ChargeElectrodeSensitivity(G4String name) :
